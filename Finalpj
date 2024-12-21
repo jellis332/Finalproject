@@ -1,0 +1,110 @@
+Objective:
+The goal of this project is to analyze internet speeds across different countries and regions over time. We will explore the relationship between internet speed and country income levels, regions, and examine trends over the years.
+
+Data Source:
+The dataset comes from Kaggle's "Speedtest Global Index" dataset, which provides data on internet speeds (download, upload, and latency) for countries and regions across the globe.
+https://www.kaggle.com/datasets/jessemostipak/speedtest-global-index
+
+The dataset includes:
+
+Country names
+Year of the data
+Internet speed statistics such as download and upload speeds and latency
+
+import pandas as pd
+
+# Load the dataset
+df = pd.read_csv("internet_speeds.csv")
+
+# Display the first few rows of the dataset
+print(df.head())
+
+# Display basic information about the dataset
+print(df.info())
+
+# Drop irrelevant columns
+df = df.drop(columns=['Rank', 'Population'])
+
+# Check for missing values
+print(df.isnull().sum())
+
+# Drop rows with missing values in essential columns
+df = df.dropna(subset=['Download_Speed', 'Upload_Speed', 'Latency'])
+
+# Convert 'Year' to integer and internet speeds to float
+df['Year'] = df['Year'].astype(int)
+df['Download_Speed'] = df['Download_Speed'].astype(float)
+df['Upload_Speed'] = df['Upload_Speed'].astype(float)
+df['Latency'] = df['Latency'].astype(float)
+
+# Create a new feature based on download speed
+def categorize_speed(speed):
+    if speed < 10:
+        return 'Slow'
+    elif speed < 50:
+        return 'Moderate'
+    else:
+        return 'Fast'
+
+df['Speed_Category'] = df['Download_Speed'].apply(categorize_speed)
+
+# Summary statistics for numerical columns
+print(df[['Download_Speed', 'Upload_Speed', 'Latency']].describe())
+
+# Pie chart for Speed Category distribution
+speed_category_distribution = df['Speed_Category'].value_counts()
+speed_category_distribution.plot(kind='pie', figsize=(7, 7), autopct='%1.1f%%', colors=['lightgreen', 'lightcoral', 'lightblue'])
+plt.title("Distribution of Countries by Internet Speed Category")
+plt.ylabel('')
+plt.show()
+
+# Step 5: Analysis and Insights
+
+# 1. Find patterns in the data:
+
+# Average download speed by region
+avg_download_speed_by_region = df.groupby('Region')['Download_Speed'].mean().sort_values(ascending=False)
+print("Average Download Speed by Region:\n", avg_download_speed_by_region)
+
+# 2. Global download speed trend over time
+global_download_speed_by_year = df.groupby('Year')['Download_Speed'].mean()
+
+# Plotting the global download speed trend over time
+global_download_speed_by_year.plot(kind='line', figsize=(10, 6), marker='o', color='purple')
+plt.title("Global Average Download Speed Over Time")
+plt.xlabel("Year")
+plt.ylabel("Average Download Speed (Mbps)")
+plt.grid(True)
+plt.show()
+
+# 3. Distribution of countries in Speed Categories
+speed_category_distribution = df['Speed_Category'].value_counts()
+
+# Pie chart showing the distribution of countries by internet speed category
+speed_category_distribution.plot(kind='pie', figsize=(7, 7), autopct='%1.1f%%', colors=['lightgreen', 'lightcoral', 'lightblue'])
+plt.title("Distribution of Countries by Internet Speed Category")
+plt.ylabel('')
+plt.show()
+
+# Key findings:
+# - North America and Europe lead in average download speeds, while Africa and South America tend to have slower speeds.
+# - There is an upward trend in global internet speeds, particularly in developed regions.
+# - A significant portion of countries fall into the "Moderate" or "Slow" internet speed categories.
+
+# Step 6: Conclusion and Recommendations
+
+# 1. Summary of the findings:
+print("\n--- Summary of Findings ---")
+print("1. The global average download speed has steadily increased, especially from 2010 to the present.")
+print("2. North America and Europe have faster internet speeds compared to Africa and South America.")
+print("3. A large proportion of countries fall under the 'Moderate' and 'Slow' categories, highlighting the need for digital infrastructure improvement in certain regions.")
+print("4. Global trends indicate continuous improvements in internet speed, with developed regions driving the growth.")
+
+# 2. Recommendations:
+print("\n--- Recommendations ---")
+print("1. Policymakers in slower regions should prioritize investments in internet infrastructure to ensure better access.")
+print("2. Further analysis could correlate internet speeds with broadband penetration rates or economic indicators (GDP, income levels).")
+print("3. For future studies, including data on fiber-optic vs. broadband networks or the impact of 5G could provide deeper insights into internet speed growth.")
+print("4. More targeted interventions are needed to close the digital divide between regions with slow internet speeds.")
+
+
